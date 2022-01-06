@@ -1,1 +1,1 @@
-# A Todo-app buikt with vue.js 3 and bootstrap
+# A Todo-app built with vue.js 3 and bootstrap
