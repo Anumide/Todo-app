@@ -15,17 +15,14 @@
       <div class="subTodoList">
         <div class="individualTodoList">
         <span>
-          <input type="checkbox" name="todocheckbox">
           <label for="todocheckbox" id="todoText">Do Something...</label>
-          <input type="text" style="display: none;">
+          <input type="text" id="todoTextEdit">
         </span>
-        <span class="checkbox-wrapper">
-          <span class="checkbox">
+        <span class="checkbox">
             <img src="./assets/images/icon-check.svg" alt="">
-          </span>
         </span>
         <!-- delete todo -->
-        <span>
+        <span class="deleteTodo">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"><path fill="#494C6B" fill-rule="evenodd" d="M16.97 0l.708.707L9.546 8.84l8.132 8.132-.707.707-8.132-8.132-8.132 8.132L0 16.97l8.132-8.132L0 .707.707 0 8.84 8.132 16.971 0z"/></svg>
         </span>
       </div>
@@ -62,7 +59,7 @@ export default {
 
 <style>
 :root{
-  --checkboxBackgroundColor: linear-gradient(45deg, hsl(192, 100%, 67%),hsl(280, 87%, 65%));
+  --checkboxBackgroundColor: linear-gradient(135deg, hsl(192, 100%, 67%),hsl(280, 87%, 65%));
   --textHoverColor: hsl(220, 98%, 61%);
   --bodyBackgroundColor: hsl(236, 33%, 92%);
   --todoBackgroundColor: hsl(0, 0%, 98%);
@@ -102,7 +99,7 @@ export default {
 }
 
 .container{
-  width: 40%;
+  width: 500px;
   padding-top: 5em;
   padding-bottom: 5em; 
 }
@@ -166,6 +163,10 @@ export default {
   position: relative;
 }
 
+.individualTodoList:hover .deleteTodo{
+  opacity: 1;
+}
+
 .individualTodoList span:nth-child(1){
   display: flex;
   justify-content: center;
@@ -173,32 +174,86 @@ export default {
 }
 
 .individualTodoList span:nth-child(1) input{
-  margin-right: 2em;
-  /* visibility: hidden; */
+  margin-left: 5px;
+  visibility: hidden;
 }
 
-.checkbox-wrapper{
-  width: 25px;
-  height: 55%;
-  border-radius: 50%;
-  border: 1px solid var(--lineThroughTextColor);
-  position: absolute;
-  left: 3%;
-  top: 23%;
-  pointer-events: none;
+#todoText{
+  display: none;
+  margin-left: 40px;
+  font-weight: 500;
+  font-size: 20px;
+  cursor: grabbing;
+  color: var(--todoTextColor)
+}
+
+#todoTextEdit{
+  margin-left: 40px;
+  visibility: visible;
+
+}
+
+#todoText.completed{
+  color: var(--lineThroughTextColor);
+  text-decoration: line-through;
 }
 
 .checkbox{
-  width: 100%;
-  height: 100%;
-  opacity: 0;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   text-align: center;
+  border: 1px solid var(--lineThroughTextColor);
+  position: absolute;
+  left: 18px;
+  top: 14px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  cursor: pointer;
+}
+
+.checkbox:hover{
+  border-radius:50%;
+  border:1px solid transparent; 
+  background: var(--checkboxBackgroundColor) border-box;
+  -webkit-mask:
+     linear-gradient(#fff 0 0) padding-box, 
+     linear-gradient(#fff 0 0);
+  mask:
+     linear-gradient(#fff 0 0) padding-box, 
+     linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out; 
+  mask-composite: exclude; 
+}
+
+.checkbox.completed{
   background: var(--checkboxBackgroundColor);
+  border: none;
+}
+
+.checkbox.completed:hover{
+  background: var(--checkboxBackgroundColor);
+  border: none;
+  -webkit-mask-composite: destination-over;
+  mask-composite: destination-over;
 }
 
 .checkbox img{
   width: 50%;
+  opacity: 0;
+}
+
+.completed img{
+  opacity: 1;
+}
+
+.deleteTodo{
+  opacity: 0;
+  transition: opacity 200ms;
+  cursor: pointer;
 }
 
 
