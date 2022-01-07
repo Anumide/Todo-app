@@ -12,18 +12,24 @@
     </div>
       <!-- list of new todos -->
     <div class="todoList">
-      <div class="individualTodo">
+      <div class="subTodoList">
+        <div class="individualTodoList">
         <span>
           <input type="checkbox" name="todocheckbox">
           <label for="todocheckbox" id="todoText">Do Something...</label>
-          <input type="text">
+          <input type="text" style="display: none;">
+        </span>
+        <span class="checkbox-wrapper">
+          <span class="checkbox">
+            <img src="./assets/images/icon-check.svg" alt="">
+          </span>
         </span>
         <!-- delete todo -->
         <span>
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"><path fill="#494C6B" fill-rule="evenodd" d="M16.97 0l.708.707L9.546 8.84l8.132 8.132-.707.707-8.132-8.132-8.132 8.132L0 16.97l8.132-8.132L0 .707.707 0 8.84 8.132 16.971 0z"/></svg>
         </span>
       </div>
-
+      </div>
       <!-- todo sublinks -->
     <div class="todoFootLinks">
       <p class="numOfItems">3 items left</p>
@@ -56,7 +62,7 @@ export default {
 
 <style>
 :root{
-  --checkboxBackgroundColor: linear-gradient hsl(192, 100%, 67%) to hsl(280, 87%, 65%);
+  --checkboxBackgroundColor: linear-gradient(45deg, hsl(192, 100%, 67%),hsl(280, 87%, 65%));
   --textHoverColor: hsl(220, 98%, 61%);
   --bodyBackgroundColor: hsl(236, 33%, 92%);
   --todoBackgroundColor: hsl(0, 0%, 98%);
@@ -150,6 +156,49 @@ export default {
 .todoList{
   border-radius: 7px;
   background-color: var(--todoBackgroundColor);
+}
+
+.individualTodoList{
+  border-bottom: 1px solid var(--textColor);
+  display: flex;
+  justify-content: space-between;
+  padding: 0.7em 1em;
+  position: relative;
+}
+
+.individualTodoList span:nth-child(1){
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.individualTodoList span:nth-child(1) input{
+  margin-right: 2em;
+  /* visibility: hidden; */
+}
+
+.checkbox-wrapper{
+  width: 25px;
+  height: 55%;
+  border-radius: 50%;
+  border: 1px solid var(--lineThroughTextColor);
+  position: absolute;
+  left: 3%;
+  top: 23%;
+  pointer-events: none;
+}
+
+.checkbox{
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  border-radius: 50%;
+  text-align: center;
+  background: var(--checkboxBackgroundColor);
+}
+
+.checkbox img{
+  width: 50%;
 }
 
 
