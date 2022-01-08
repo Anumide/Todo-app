@@ -1,24 +1,25 @@
 <template>
+<div v-bind:class="theme" id="theme">
   <div class="jumbotron bg-primary">
     <div class="container">
         <!-- for the todo logo and changing of theme  -->
       <div class="logoTheme">
         <h1 class="h1">TODO</h1>
-        <img class="themeImage" alt="change to dark or light theme">
+        <img @click ="changeTheme" class="themeImage" alt="change to dark or light theme">
       </div>
           <!-- for adding new todo -->
     <div class="newTodo">
-      <input type="text" placeholder="Create a new todo...">
+      <input type="text" placeholder="Create a new todo..." @keydown.enter="addTodo" v-model="todoItem">
     </div>
       <!-- list of new todos -->
     <div class="todoList">
       <div class="subTodoList">
-        <div class="individualTodoList">
+        <div class="individualTodoList" v-for="todo in todoList" v-bind:key="todo">
         <span>
-          <label for="todocheckbox" id="todoText">Do Something...</label>
-          <input type="text" id="todoTextEdit">
+          <label v-if="!todo.editable" for="todocheckbox" class="todoText" v-bind:class="{completed: todo.isCompleted}">{{todo.name}}</label>
+          <input v-else type="text" id="todoTextEdit">
         </span>
-        <span class="checkbox">
+        <span class="checkbox" @click="isCompleted" v-bind:class="{completed: todo.isCompleted}">
             <img src="./assets/images/icon-check.svg" alt="">
         </span>
         <!-- delete todo -->
@@ -48,11 +49,52 @@
       <p>Drag and drop to reorder list</p>
     </div>
   </div>
+</div>
+  {{todoList}}
 </template>
 
 <script>
 
 export default {
+  data(){
+    return{
+      theme: 'lightTheme',
+      completed: '',
+      todoItem: '',
+      todoList: [],
+      id: 0,
+    }
+  },
+  methods:{
+    changeTheme(){
+      if(this.theme == 'lightTheme'){
+        this.theme = 'darkTheme'
+      } else{
+        this.theme = 'lightTheme'
+      }
+    },
+    addTodo(){
+      this.todoList.push(
+        {
+        name: this.todoItem,
+        editable: false,
+        isCompleted: false,
+        id: this.id
+      }
+      )
+      this.id++
+      this.todoItem = ''
+    },
+    isCompleted(){
+      if(!this.isCompleted){
+        this.isCompleted = true
+        console.log(this.isCompleted);
+      } else{
+        this.isCompleted = false
+        console.log(this.isCompleted);
+      }
+    }
+  }
   
 }
 </script>
@@ -80,7 +122,7 @@ export default {
    --themeImage: url('./assets/images/icon-sun.svg');
 }
 
-#app{
+#theme{
   height: 100vh;
   background-color: var(--bodyBackgroundColor);
   transition: background-color 500ms;
@@ -107,6 +149,7 @@ export default {
 .logoTheme{
   display: flex;
   justify-content: space-between;
+
 }
 
 .h1{
@@ -121,6 +164,7 @@ export default {
   transition: content 500ms;
   width: 7%;
   height: 10%;
+  cursor: pointer;
 }
 
 .newTodo{
@@ -161,6 +205,7 @@ export default {
   justify-content: space-between;
   padding: 0.7em 1em;
   position: relative;
+  cursor: grabbing;
 }
 
 .individualTodoList:hover .deleteTodo{
@@ -178,22 +223,22 @@ export default {
   visibility: hidden;
 }
 
-#todoText{
-  display: none;
+.todoText{
+  display: inline-block;
   margin-left: 40px;
   font-weight: 500;
   font-size: 20px;
-  cursor: grabbing;
+  cursor: text;
   color: var(--todoTextColor)
 }
 
 #todoTextEdit{
+  display: inline-block;
   margin-left: 40px;
   visibility: visible;
-
 }
 
-#todoText.completed{
+.todoText.completed{
   color: var(--lineThroughTextColor);
   text-decoration: line-through;
 }
@@ -256,6 +301,29 @@ export default {
   cursor: pointer;
 }
 
+.todoFootLinks{
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.numOfItems, .clearComplete{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  font-size: .9rem;
+  font-weight: 500;
+  color: var(--textColor);
+}
+
+.clearComplete{
+  cursor: pointer;
+}
+
+.clearComplete:hover{
+  color: var(--todoTextColor)
+}
 
 </style>
 
