@@ -14,16 +14,16 @@
       <!-- list of new todos -->
     <div class="todoList">
       <div class="subTodoList">
-        <div class="individualTodoList" v-for="todo in todoList" v-bind:key="todo">
+        <div class="individualTodoList" v-for="(todo, index) in todoList" v-bind:key="todo">
         <span>
-          <label v-if="!todo.editable" for="todocheckbox" class="todoText" v-bind:class="{completed: todo.isCompleted}">{{todo.name}}</label>
-          <input v-else type="text" id="todoTextEdit">
+          <label v-if="!todo.editable" @dblclick="isEditable(todo)" for="todocheckbox" class="todoText" v-bind:class="{completed: todo.isCompleted}" @mouseover="showActive(todo)">{{todo.name}}</label>
+          <input v-else type="text" v-model="todo.name" id="todoTextEdit" @keydown.enter="editCompleted(todo)" @blur="editCompleted(todo)">
         </span>
-        <span class="checkbox" @click="isCompleted" v-bind:class="{completed: todo.isCompleted}">
+        <span class="checkbox" @click="todoCompleted(todo)" v-bind:class="{completed: todo.isCompleted}">
             <img src="./assets/images/icon-check.svg" alt="">
         </span>
         <!-- delete todo -->
-        <span class="deleteTodo">
+        <span class="deleteTodo" @click="deleteTodo(index)">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"><path fill="#494C6B" fill-rule="evenodd" d="M16.97 0l.708.707L9.546 8.84l8.132 8.132-.707.707-8.132-8.132-8.132 8.132L0 16.97l8.132-8.132L0 .707.707 0 8.84 8.132 16.971 0z"/></svg>
         </span>
       </div>
@@ -46,7 +46,7 @@
         <span>completed</span>
       </div>
 
-      <p>Drag and drop to reorder list</p>
+      <p class="dragInfo">Drag and drop to reorder list</p>
     </div>
   </div>
 </div>
@@ -67,7 +67,7 @@ export default {
   },
   methods:{
     changeTheme(){
-      if(this.theme == 'lightTheme'){
+      if(this.theme === 'lightTheme'){
         this.theme = 'darkTheme'
       } else{
         this.theme = 'lightTheme'
@@ -85,15 +85,26 @@ export default {
       this.id++
       this.todoItem = ''
     },
-    isCompleted(){
-      if(!this.isCompleted){
-        this.isCompleted = true
-        console.log(this.isCompleted);
+    todoCompleted(todo){
+      if(!todo.isCompleted){
+        todo.isCompleted = true
       } else{
-        this.isCompleted = false
-        console.log(this.isCompleted);
+        todo.isCompleted = false
       }
-    }
+    },
+    isEditable(todo){
+      todo.editable = true;
+    },
+    editCompleted(todo){
+      todo.editable = false;
+    },
+    showActive(e){
+      console.log(e.target)
+    },
+    deleteTodo(index){
+      this.todoList.splice(index, 1);
+    },
+
   }
   
 }
@@ -168,7 +179,7 @@ export default {
 }
 
 .newTodo{
-  margin: 3em 0 1em 0;
+  margin: 3em 0 1.2em 0;
 }
 
 .newTodo input{
@@ -197,6 +208,7 @@ export default {
 .todoList{
   border-radius: 7px;
   background-color: var(--todoBackgroundColor);
+  box-shadow: 0 0 15px 1px rgba(0, 0, 0, .3) ;
 }
 
 .individualTodoList{
@@ -241,6 +253,7 @@ export default {
 .todoText.completed{
   color: var(--lineThroughTextColor);
   text-decoration: line-through;
+  pointer-events: none;
 }
 
 .checkbox{
@@ -323,6 +336,36 @@ export default {
 
 .clearComplete:hover{
   color: var(--todoTextColor)
+}
+
+.links{
+  display: flex;
+  justify-content: space-between;
+  width: 35%;
+  text-transform: capitalize;
+  font-size: .9rem;
+  font-weight: 500;
+  color: var(--textColor);
+}
+
+.links span{
+  cursor: pointer;
+  transition: color 200ms;
+}
+
+.links span:hover{
+  color: var(--todoTextColor);
+}
+
+.links span.active{
+  color: var(--textHoverColor);
+}
+
+.dragInfo{
+  margin: 2em;
+  text-align: center;
+  opacity: .7;
+  color: var(--textColor);
 }
 
 </style>
