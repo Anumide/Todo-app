@@ -9,14 +9,14 @@
       </div>
           <!-- for adding new todo -->
     <div class="newTodo">
-      <input type="text" placeholder="Create a new todo..." @keydown.enter="addTodo" v-model="todoItem">
+      <input type="text" required placeholder="Create a new todo..." @keydown.enter="addTodo" v-model="todoItem">
     </div>
       <!-- list of new todos -->
     <div class="todoList">
       <div class="subTodoList">
-        <div class="individualTodoList" v-for="(todo, index) in todoList" v-bind:key="todo">
+        <div class="individualTodoList" v-show="changeComplete()" v-for="(todo, index) in todoList" v-bind:key="todo">
         <span>
-          <label v-if="!todo.editable" @dblclick="isEditable(todo)" for="todocheckbox" class="todoText" v-bind:class="{completed: todo.isCompleted}" @mouseover="showActive(todo)">{{todo.name}}</label>
+          <label v-if="!todo.editable" @dblclick="isEditable(todo)" for="todocheckbox" class="todoText" v-bind:class="{completed: todo.isCompleted}">{{todo.name}}</label>
           <input v-else type="text" v-model="todo.name" id="todoTextEdit" @keydown.enter="editCompleted(todo)" @blur="editCompleted(todo)">
         </span>
         <span class="checkbox" @click="todoCompleted(todo)" v-bind:class="{completed: todo.isCompleted}">
@@ -32,15 +32,15 @@
     <div class="todoFootLinks">
       <p class="numOfItems">3 items left</p>
       <div class="links">
-        <span>all</span>
-        <span>active</span>
-        <span>completed</span>
+        <span @click="showAll" v-bind:class="{active: showAll}">all</span>
+        <span @click="showActive">active</span>
+        <span @click="showCompleted">completed</span>
       </div>
       <p class="clearComplete">clear complete</p>
     </div>
     </div>
 
-       <div class="mobileLinks" style="display: none;">
+       <div class="mobileLinks">
         <span>all</span>
         <span>active</span>
         <span>completed</span>
@@ -59,13 +59,20 @@ export default {
   data(){
     return{
       theme: 'lightTheme',
-      completed: '',
+      completed: true,
       todoItem: '',
       todoList: [],
       id: 0,
+      todoDummyObject: {}
     }
   },
   methods:{
+    todoObject(obj, id){
+      this.name = obj,
+      this.editable = false,
+      this.isCompleted = false,
+      this.id = id
+    },
     changeTheme(){
       if(this.theme === 'lightTheme'){
         this.theme = 'darkTheme'
@@ -74,14 +81,8 @@ export default {
       }
     },
     addTodo(){
-      this.todoList.push(
-        {
-        name: this.todoItem,
-        editable: false,
-        isCompleted: false,
-        id: this.id
-      }
-      )
+      this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
+      this.todoList.push(this.todoDummyObject)
       this.id++
       this.todoItem = ''
     },
@@ -98,9 +99,37 @@ export default {
     editCompleted(todo){
       todo.editable = false;
     },
-    showActive(e){
-      console.log(e.target)
+    changeComplete(){
+      return this.completed
     },
+    showAll(){
+      if(this.todoDummyObject.isCompleted || !this.todoDummyObject.isCompleted){
+        this.completed = true
+        console.log(this.todoDummyObject.isCompleted, this.completed)
+      }else{
+        this.completed = false
+        console.log('failed');
+      }
+    },
+    showActive(){
+      if(!this.todoDummyObject.isCompleted){
+        this.completed = true
+        console.log(this.todoDummyObject.isCompleted, this.completed)
+      }else{
+        this.completed = false
+        console.log('failed');
+      }
+    },
+    showCompleted(){
+      if(this.todoDummyObject.isCompleted){
+        this.completed = true
+        console.log(this.todoDummyObject.isCompleted, this.completed)
+      }else{
+        this.completed = false
+        console.log(this.todoDummyObject.isCompleted, this.completed)
+      }
+    },
+
     deleteTodo(index){
       this.todoList.splice(index, 1);
     },
@@ -129,7 +158,7 @@ export default {
   --todoBackgroundColor: hsl(235, 24%, 19%);
    --todoTextColor: hsl(234, 39%, 85%);
    --jumbotronBackground: url('./assets/images/bg-desktop-dark.jpg');
-   --mobilejumbotronBackground: url('./assets/images/bg-mobile-light.jpg');
+   --mobilejumbotronBackground: url('./assets/images/bg-mobile-dark.jpg');
    --themeImage: url('./assets/images/icon-sun.svg');
 }
 
@@ -226,8 +255,10 @@ export default {
 
 .individualTodoList span:nth-child(1){
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
+  width: 100%;
+  margin-left: 40px;
 }
 
 .individualTodoList span:nth-child(1) input{
@@ -237,11 +268,12 @@ export default {
 
 .todoText{
   display: inline-block;
-  margin-left: 40px;
   font-weight: 500;
   font-size: 20px;
   cursor: text;
-  color: var(--todoTextColor)
+  color: var(--todoTextColor);
+  overflow-y: scroll;
+  width: 90%;
 }
 
 #todoTextEdit{
@@ -338,6 +370,10 @@ export default {
   color: var(--todoTextColor)
 }
 
+.mobileLinks{
+  display: none;
+}
+
 .links{
   display: flex;
   justify-content: space-between;
@@ -357,7 +393,7 @@ export default {
   color: var(--todoTextColor);
 }
 
-.links span.active{
+.active{
   color: var(--textHoverColor);
 }
 
@@ -366,6 +402,63 @@ export default {
   text-align: center;
   opacity: .7;
   color: var(--textColor);
+}
+
+@media screen and (max-width: 550px){
+  .container{
+    width: 100%;
+  }
+
+  .jumbotron{
+    background-image: var(--mobilejumbotronBackground) !important;
+  }
+
+  .logoTheme{
+    width: 90%;
+    margin: auto;
+  }
+
+  .newTodo{
+    width: 90%;
+    margin: 4em auto 1.2em auto;
+  }
+
+  .todoList{
+    width: 90%;
+    margin: auto;
+  }
+
+  .h1{
+    font-size: calc(1.375rem + 1.5vw);
+  }
+
+  .links{
+    display: none;
+  }
+
+  .mobileLinks{
+    width: 90%;
+    text-transform: capitalize;
+    font-size: .9rem;
+    font-weight: 500;
+    color: var(--textColor);
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    background: var(--todoBackgroundColor);
+    margin: 15px auto;
+    border-radius: 7px;
+    padding: 0.8em 4em;
+  }
+
+  .mobileLinks span{
+    transition: color 200ms;
+  }
+
+  .mobileLinks span:hover{
+    color: var(--todoTextColor);
+  }
+
 }
 
 </style>
