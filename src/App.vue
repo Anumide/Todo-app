@@ -14,7 +14,7 @@
       <!-- list of new todos -->
     <div class="todoList">
       <div class="subTodoList">
-        <div class="individualTodoList" v-show="changeComplete()" v-for="(todo, index) in todoList" v-bind:key="todo">
+        <div class="individualTodoList" v-for="(todo, index) in todoList" v-bind:key="todo">
         <span>
           <label v-if="!todo.editable" @dblclick="isEditable(todo)" for="todocheckbox" class="todoText" v-bind:class="{completed: todo.isCompleted}">{{todo.name}}</label>
           <input v-else type="text" v-model="todo.name" id="todoTextEdit" @keydown.enter="editCompleted(todo)" @blur="editCompleted(todo)">
@@ -50,7 +50,6 @@
     </div>
   </div>
 </div>
-  {{todoList}}
 </template>
 
 <script>
@@ -59,9 +58,10 @@ export default {
   data(){
     return{
       theme: 'lightTheme',
-      completed: true,
       todoItem: '',
       todoList: [],
+      filteredTodoList: [],
+      finalTodoList: [],
       id: 0,
       todoDummyObject: {}
     }
@@ -83,6 +83,7 @@ export default {
     addTodo(){
       this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
       this.todoList.push(this.todoDummyObject)
+      this.finalTodoList = this.todoList
       this.id++
       this.todoItem = ''
     },
@@ -99,35 +100,25 @@ export default {
     editCompleted(todo){
       todo.editable = false;
     },
-    changeComplete(){
-      return this.completed
-    },
     showAll(){
-      if(this.todoDummyObject.isCompleted || !this.todoDummyObject.isCompleted){
-        this.completed = true
-        console.log(this.todoDummyObject.isCompleted, this.completed)
-      }else{
-        this.completed = false
-        console.log('failed');
-      }
-    },
+      this.todoList = this.finalTodoList
+      },
     showActive(){
-      if(!this.todoDummyObject.isCompleted){
-        this.completed = true
-        console.log(this.todoDummyObject.isCompleted, this.completed)
-      }else{
-        this.completed = false
-        console.log('failed');
-      }
+      this.filterdTodoList = this.finalTodoList.filter(e => {
+        if(!e.isCompleted){
+          return e
+        }
+      })
+      this.todoList = this.filterdTodoList
     },
     showCompleted(){
-      if(this.todoDummyObject.isCompleted){
-        this.completed = true
-        console.log(this.todoDummyObject.isCompleted, this.completed)
-      }else{
-        this.completed = false
-        console.log(this.todoDummyObject.isCompleted, this.completed)
-      }
+      this.filterdTodoList = this.finalTodoList.filter(e => {
+        if(e.isCompleted){
+          return e
+        }
+      })
+      this.todoList = this.filterdTodoList
+      console.log(this.filterdTodoList)
     },
 
     deleteTodo(index){
@@ -272,7 +263,6 @@ export default {
   font-size: 20px;
   cursor: text;
   color: var(--todoTextColor);
-  overflow-y: scroll;
   width: 90%;
 }
 
