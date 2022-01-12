@@ -30,26 +30,29 @@
       </div>
       <!-- todo sublinks -->
     <div class="todoFootLinks">
-      <p class="numOfItems">3 items left</p>
+      <p class="numOfItems">{{todoNum}} item(s) left</p>
       <div class="links">
-        <span @click="showAll" v-bind:class="{active: showAll}">all</span>
-        <span @click="showActive">active</span>
-        <span @click="showCompleted">completed</span>
+        <span @click="showAll" class="active" ref="showalldesktop">all</span>
+        <span @click="showActive" ref="showactivedesktop">active</span>
+        <span @click="showCompleted" ref="showcompleteddesktop">completed</span>
       </div>
       <p class="clearComplete">clear complete</p>
     </div>
     </div>
 
        <div class="mobileLinks">
-        <span>all</span>
-        <span>active</span>
-        <span>completed</span>
+        <span @click="showAll" class="active" ref="showall">all</span>
+        <span @click="showActive" ref="showactive">active</span>
+        <span @click="showCompleted" ref="showcompleted">completed</span>
       </div>
 
       <p class="dragInfo">Drag and drop to reorder list</p>
     </div>
   </div>
 </div>
+{{todoList}}<br><br>
+{{filteredTodoList}}<br><br>
+{{finalTodoList}}
 </template>
 
 <script>
@@ -62,7 +65,9 @@ export default {
       todoList: [],
       filteredTodoList: [],
       finalTodoList: [],
-      id: 0,
+      activeTodoList: [],
+      numOfTodo: [],
+      todoNum: '0',
       todoDummyObject: {}
     }
   },
@@ -80,18 +85,30 @@ export default {
         this.theme = 'lightTheme'
       }
     },
-    addTodo(){
-      this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
-      this.todoList.push(this.todoDummyObject)
-      this.finalTodoList = this.todoList
-      this.id++
+    addTodo(){      
+      if(this.$refs.showcompleteddesktop.classList.contains('active')){
+         this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
+        this.finalTodoList.push(this.todoDummyObject)
+      }else if(this.$refs.showcompleted.classList.contains('active')){
+         this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
+        this.finalTodoList.push(this.todoDummyObject)
+      }else{
+        this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
+        this.finalTodoList.push(this.todoDummyObject)
+        this.todoList = this.finalTodoList
+      }
       this.todoItem = ''
+      this.countingTodo()      
     },
     todoCompleted(todo){
       if(!todo.isCompleted){
         todo.isCompleted = true
       } else{
         todo.isCompleted = false
+      }
+      this.countingTodo()
+      if(this.$refs.showactivedesktop.classList.contains('active')){
+        this.showActive()
       }
     },
     isEditable(todo){
@@ -102,6 +119,12 @@ export default {
     },
     showAll(){
       this.todoList = this.finalTodoList
+      this.$refs.showactive.classList.remove('active')
+      this.$refs.showall.classList.add('active')
+      this.$refs.showcompleted.classList.remove('active')
+      this.$refs.showactivedesktop.classList.remove('active')
+      this.$refs.showalldesktop.classList.add('active')
+      this.$refs.showcompleteddesktop.classList.remove('active')
       },
     showActive(){
       this.filterdTodoList = this.finalTodoList.filter(e => {
@@ -109,7 +132,14 @@ export default {
           return e
         }
       })
-      this.todoList = this.filterdTodoList
+      this.activeTodoList = this.filterdTodoList
+      this.todoList = this.activeTodoList
+      this.$refs.showactive.classList.add('active')
+      this.$refs.showall.classList.remove('active')
+      this.$refs.showcompleted.classList.remove('active')
+      this.$refs.showactivedesktop.classList.add('active')
+      this.$refs.showalldesktop.classList.remove('active')
+      this.$refs.showcompleteddesktop.classList.remove('active')
     },
     showCompleted(){
       this.filterdTodoList = this.finalTodoList.filter(e => {
@@ -118,12 +148,28 @@ export default {
         }
       })
       this.todoList = this.filterdTodoList
-      console.log(this.filterdTodoList)
+      this.$refs.showactive.classList.remove('active')
+      this.$refs.showall.classList.remove('active')
+      this.$refs.showcompleted.classList.add('active')
+      this.$refs.showactivedesktop.classList.remove('active')
+      this.$refs.showalldesktop.classList.remove('active')
+      this.$refs.showcompleteddesktop.classList.add('active')
     },
 
     deleteTodo(index){
-      this.todoList.splice(index, 1);
+      console.log(index)
+      this.todoList.splice(index, 1)
+      this.finalTodoList.splice(index, 1);
     },
+    countingTodo(){
+      this.filterdTodoList = this.finalTodoList.filter(e => {
+        if(!e.isCompleted){
+          return e
+        }
+      })
+      this.numOfTodo = this.filterdTodoList
+      this.todoNum = parseInt(this.numOfTodo.length)
+    }
 
   }
   
@@ -443,6 +489,7 @@ export default {
 
   .mobileLinks span{
     transition: color 200ms;
+    cursor: pointer;
   }
 
   .mobileLinks span:hover{
