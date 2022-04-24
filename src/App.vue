@@ -5,7 +5,8 @@
         <!-- for the todo logo and changing of theme  -->
       <div class="logoTheme">
         <h1 class="h1">TODO</h1>
-        <img @click ="changeTheme" class="themeImage" alt="change to dark or light theme">
+        <span class="themeImage" @click ="changeTheme"></span>
+        <!-- <img @click ="changeTheme" class="themeImage" alt="change to dark or light theme"> -->
       </div>
           <!-- for adding new todo -->
     <div class="newTodo">
@@ -237,10 +238,11 @@ export default {
 }
 
 .themeImage{
-  content: var(--themeImage);
-  transition: content 500ms;
-  width: 7%;
-  height: 10%;
+  /* content: var(--themeImage); */
+  background: var(--themeImage) no-repeat;
+  background-size: contain;
+  transition: background 500ms;
+  width: 6%;
   cursor: pointer;
 }
 
@@ -314,7 +316,7 @@ export default {
 
 #todoTextEdit{
   display: inline-block;
-  margin-left: 40px;
+  /* margin-left: 10px; */
   visibility: visible;
 }
 
