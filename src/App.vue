@@ -141,6 +141,7 @@ export default {
       this.$refs.showactivedesktop.classList.add('active')
       this.$refs.showalldesktop.classList.remove('active')
       this.$refs.showcompleteddesktop.classList.remove('active')
+      this.countingTodo()
     },
     showCompleted(){
       this.filterdTodoList = this.finalTodoList.filter(e => {
@@ -158,9 +159,20 @@ export default {
     },
 
     deleteTodo(index){
-      console.log(index)
-      this.todoList.splice(index, 1)
-      this.finalTodoList.splice(index, 1);
+      console.log(index, this.numOfTodo.length)
+       this.todoList.splice(index, 1)
+      // this.finalTodoList.splice(index, 1);
+      this.countingTodo()
+      for(let i = 0; i < this.todoList; i++){
+        console.log(this.todoList[i])
+        this.todoList[i].splice(index, 1)
+        break;
+      }
+
+      for(let i = 0; i < this.finalTodoList; i++){
+        this.todoList[i].splice(index, 1)
+        break;
+      }
     },
     countingTodo(){
       this.filterdTodoList = this.finalTodoList.filter(e => {
