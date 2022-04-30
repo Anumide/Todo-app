@@ -37,7 +37,7 @@
         <span @click="showActive" ref="showactivedesktop">active</span>
         <span @click="showCompleted" ref="showcompleteddesktop">completed</span>
       </div>
-      <p class="clearComplete">clear complete</p>
+      <p class="clearComplete" @click="clearComplete">clear complete</p>
     </div>
     </div>
 
@@ -87,19 +87,31 @@ export default {
       }
     },
     addTodo(){      
-      if(this.$refs.showcompleteddesktop.classList.contains('active')){
-         this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
-        this.finalTodoList.push(this.todoDummyObject)
-      }else if(this.$refs.showcompleted.classList.contains('active')){
-         this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
-        this.finalTodoList.push(this.todoDummyObject)
-      }else{
-        this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
-        this.finalTodoList.push(this.todoDummyObject)
-        this.todoList = this.finalTodoList
-      }
-      this.todoItem = ''
-      this.countingTodo()      
+      if(!this.todoItem == ''){
+          if(this.$refs.showcompleteddesktop.classList.contains('active')){
+          this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
+          this.finalTodoList.push(this.todoDummyObject)
+        }else if(this.$refs.showcompleted.classList.contains('active')){
+          this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
+          this.finalTodoList.push(this.todoDummyObject)
+        }else{
+          this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
+          this.finalTodoList.push(this.todoDummyObject)
+          this.todoList = this.finalTodoList
+        }
+        this.todoItem = ''
+        this.countingTodo() 
+      } else{
+        this.todoList.forEach(ele =>{
+          if(this.todoItem == ele.name){
+            console.log('task already exist')
+            console.log(ele)
+          }else{
+            console.log('invalid input')
+            console.log(ele.name)
+          }
+        })
+      }   
     },
     todoCompleted(todo){
       if(!todo.isCompleted){
@@ -159,20 +171,20 @@ export default {
     },
 
     deleteTodo(index){
-      console.log(index, this.numOfTodo.length)
+      //console.log(index, this.numOfTodo.length)
        this.todoList.splice(index, 1)
       // this.finalTodoList.splice(index, 1);
       this.countingTodo()
-      for(let i = 0; i < this.todoList; i++){
-        console.log(this.todoList[i])
-        this.todoList[i].splice(index, 1)
-        break;
-      }
+      // for(let i = 0; i < this.todoList; i++){
+      //   console.log(this.todoList[i])
+      //   this.todoList[i].splice(index, 1)
+      //   break;
+      // }
 
-      for(let i = 0; i < this.finalTodoList; i++){
-        this.todoList[i].splice(index, 1)
-        break;
-      }
+      // for(let i = 0; i < this.finalTodoList; i++){
+      //   this.todoList[i].splice(index, 1)
+      //   break;
+      // }
     },
     countingTodo(){
       this.filterdTodoList = this.finalTodoList.filter(e => {
@@ -182,6 +194,15 @@ export default {
       })
       this.numOfTodo = this.filterdTodoList
       this.todoNum = parseInt(this.numOfTodo.length)
+    },
+    clearComplete(){
+     
+      this.todoList.filter(e => {
+        if(e.isCompleted){
+          this.finalTodoList.splice(this.todoList.indexOf(e), 1)
+        }
+      })
+      
     }
 
   }
