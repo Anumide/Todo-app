@@ -197,12 +197,16 @@ export default {
     },
     clearComplete(){
      
-      this.todoList.filter(e => {
-        if(e.isCompleted){
-          this.finalTodoList.splice(this.todoList.indexOf(e), 1)
+      this.filteredTodoList = this.todoList.filter(e => {
+        if(!e.isCompleted){
+          return e
         }
+        console.log(e, 'clicked!')
       })
-      
+
+      // this.todoList = this.filteredTodoList
+      this.finalTodoList = this.filteredTodoList
+      this.todoList = this.finalTodoList
     }
 
   }
