@@ -201,12 +201,21 @@ export default {
         if(!e.isCompleted){
           return e
         }
-        console.log(e, 'clicked!')
       })
 
-      // this.todoList = this.filteredTodoList
-      this.finalTodoList = this.filteredTodoList
-      this.todoList = this.finalTodoList
+      if(this.$refs.showcompleteddesktop.classList.contains('active') || this.$refs.showcompleted.classList.contains('active')){
+          this.filteredTodoList = this.finalTodoList.filter(e => {
+            if(e.isCompleted){
+              return e
+            }
+          })
+          this.todoList = this.filteredTodoList
+      }else{
+          // this.todoList = this.filteredTodoList
+        this.finalTodoList = this.filteredTodoList
+        this.todoList = this.finalTodoList
+      }
+     
     }
 
   }
