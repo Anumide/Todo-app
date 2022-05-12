@@ -87,34 +87,59 @@ export default {
       }
     },
     addTodo(){      
-      if(!this.todoItem == ''){
-          if(this.$refs.showcompleteddesktop.classList.contains('active')){
-          this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
-          this.finalTodoList.push(this.todoDummyObject)
-          console.log(this.todoItem)
-        }else if(this.$refs.showcompleted.classList.contains('active')){
-          this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
-          this.finalTodoList.push(this.todoDummyObject)
-          console.log(this.todoItem + ' else if')
-        }else{
-          this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
-          this.finalTodoList.push(this.todoDummyObject)
-          this.todoList = this.finalTodoList
-          console.log(this.todoItem + ' else')
-        }
-        this.todoItem = ''
-        this.countingTodo() 
-      } else{
-        this.todoList.forEach(ele =>{
-          if(this.todoItem == ele.name){
-            console.log('task already exist')
-            console.log(ele)
+      if(this.todoList.length == 0){
+        if(!this.todoItem == ''){
+            if(this.$refs.showcompleteddesktop.classList.contains('active')){
+            this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
+            this.finalTodoList.push(this.todoDummyObject)
+            //console.log(this.todoItem)
+          }else if(this.$refs.showcompleted.classList.contains('active')){
+            this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
+            this.finalTodoList.push(this.todoDummyObject)
+            //console.log(this.todoItem + ' else if')
           }else{
-            console.log('invalid input')
-            console.log(ele.name)
+            this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
+            this.finalTodoList.push(this.todoDummyObject)
+            this.todoList = this.finalTodoList
+            //console.log(this.todoItem + ' else')
           }
-        })
-      }   
+          this.todoItem = ''
+          this.countingTodo() 
+        }else{
+          console.log('enter an input!')
+        }
+      }else{
+        if(this.todoItem == ''){
+          console.log('enter an input!')
+        }else{
+          this.todoList.forEach(ele =>{
+            if(this.todoItem == ele.name){
+              console.log('task already exist')
+              //console.log(ele)
+            }else{
+                if(this.$refs.showcompleteddesktop.classList.contains('active')){
+                  this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
+                  this.finalTodoList.push(this.todoDummyObject)
+                  //console.log(this.todoItem)
+                }else if(this.$refs.showcompleted.classList.contains('active')){
+                  this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
+                  this.finalTodoList.push(this.todoDummyObject)
+                  //console.log(this.todoItem + ' else if')
+                }else{
+                  this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
+                  this.finalTodoList.push(this.todoDummyObject)
+                  this.todoList = this.finalTodoList
+                  //console.log(this.todoItem + ' else')
+                }
+                this.todoItem = ''
+                this.countingTodo() 
+            }
+            // console.log(ele.name, typeof ele.name)
+            // console.log(this.todoItem, typeof this.todoItem)
+            // console.log(this.todoItem == ele.name)
+          })
+        }
+      }
     },
     todoCompleted(todo){
       if(!todo.isCompleted){
@@ -219,7 +244,6 @@ export default {
         this.finalTodoList = this.filteredTodoList
         this.todoList = this.finalTodoList
       }
-        console.log(this.finalTodoList)
     }
 
   }
