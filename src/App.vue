@@ -18,7 +18,7 @@
         <div class="individualTodoList" v-for="(todo, index) in todoList" v-bind:key="todo">
         <span>
           <label v-if="!todo.editable" @dblclick="isEditable(todo)" for="todocheckbox" class="todoText" v-bind:class="{completed: todo.isCompleted}">{{todo.name}}</label>
-          <input v-else type="text" v-model="todo.name" id="todoTextEdit" @keydown.enter="editCompleted(todo)" @blur="editCompleted(todo)">
+          <input v-else type="text" v-model="todo.name" id="todoTextEdit" @keydown.enter="editCompleted(todo)" @blur="editCompleted(todo)" @focusout="editCompleted(todo)">
         </span>
         <span class="checkbox" @click="todoCompleted(todo)" v-bind:class="{completed: todo.isCompleted}">
             <img src="./assets/images/icon-check.svg" alt="">
@@ -91,13 +91,16 @@ export default {
           if(this.$refs.showcompleteddesktop.classList.contains('active')){
           this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
           this.finalTodoList.push(this.todoDummyObject)
+          console.log(this.todoItem)
         }else if(this.$refs.showcompleted.classList.contains('active')){
           this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
           this.finalTodoList.push(this.todoDummyObject)
+          console.log(this.todoItem + ' else if')
         }else{
           this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
           this.finalTodoList.push(this.todoDummyObject)
           this.todoList = this.finalTodoList
+          console.log(this.todoItem + ' else')
         }
         this.todoItem = ''
         this.countingTodo() 
@@ -204,18 +207,19 @@ export default {
       })
 
       if(this.$refs.showcompleteddesktop.classList.contains('active') || this.$refs.showcompleted.classList.contains('active')){
+          this.todoList = []
           this.filteredTodoList = this.finalTodoList.filter(e => {
-            if(e.isCompleted){
-              return e
-            }
-          })
-          this.todoList = this.filteredTodoList
+            if(!e.isCompleted){
+                return e
+              }
+            })
+            this.finalTodoList = this.filteredTodoList
       }else{
           // this.todoList = this.filteredTodoList
         this.finalTodoList = this.filteredTodoList
         this.todoList = this.finalTodoList
       }
-     
+        console.log(this.finalTodoList)
     }
 
   }
