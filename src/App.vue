@@ -87,58 +87,52 @@ export default {
       }
     },
     addTodo(){      
-      if(this.todoList.length == 0){
+          
+      if(!this.finalTodoList.length == 0){
         if(!this.todoItem == ''){
-            if(this.$refs.showcompleteddesktop.classList.contains('active')){
-            this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
-            this.finalTodoList.push(this.todoDummyObject)
-            //console.log(this.todoItem)
-          }else if(this.$refs.showcompleted.classList.contains('active')){
-            this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
-            this.finalTodoList.push(this.todoDummyObject)
-            //console.log(this.todoItem + ' else if')
+          for(let x = 0; x < this.finalTodoList.length; x++){
+            if(!(this.todoItem.toLowerCase() == this.finalTodoList[x].name.toLowerCase())){
+              if(this.$refs.showcompleteddesktop.classList.contains('active') || this.$refs.showcompleted.classList.contains('active')){
+                this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
+                this.finalTodoList.push(this.todoDummyObject)
+                this.todoItem = ''
+                this.countingTodo() 
+                console.log(this.finalTodoList[x].name)
+                return
+              }else{
+                this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
+                this.finalTodoList.push(this.todoDummyObject)
+                this.todoList = this.finalTodoList
+                this.todoItem = ''
+                this.countingTodo() 
+                console.log(this.finalTodoList[x].name)
+                return
+              }
+              
+            }
+            console.log('task already exist')
+            this.todoItem = ''
+          }
+          return
+        }
+          console.log('enter an input!')
+      }else{
+
+      if(!this.todoItem == ''){
+            if(this.$refs.showcompleteddesktop.classList.contains('active') ||  this.$refs.showcompleted.classList.contains('active')){
+              this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
+              this.finalTodoList.push(this.todoDummyObject)
+              return
           }else{
             this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
             this.finalTodoList.push(this.todoDummyObject)
             this.todoList = this.finalTodoList
-            //console.log(this.todoItem + ' else')
           }
           this.todoItem = ''
           this.countingTodo() 
-        }else{
-          console.log('enter an input!')
+          return
         }
-      }else{
-        if(this.todoItem == ''){
           console.log('enter an input!')
-        }else{
-          this.todoList.forEach(ele =>{
-            if(this.todoItem == ele.name){
-              console.log('task already exist')
-              //console.log(ele)
-            }else{
-                if(this.$refs.showcompleteddesktop.classList.contains('active')){
-                  this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
-                  this.finalTodoList.push(this.todoDummyObject)
-                  //console.log(this.todoItem)
-                }else if(this.$refs.showcompleted.classList.contains('active')){
-                  this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
-                  this.finalTodoList.push(this.todoDummyObject)
-                  //console.log(this.todoItem + ' else if')
-                }else{
-                  this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
-                  this.finalTodoList.push(this.todoDummyObject)
-                  this.todoList = this.finalTodoList
-                  //console.log(this.todoItem + ' else')
-                }
-                this.todoItem = ''
-                this.countingTodo() 
-            }
-            // console.log(ele.name, typeof ele.name)
-            // console.log(this.todoItem, typeof this.todoItem)
-            // console.log(this.todoItem == ele.name)
-          })
-        }
       }
     },
     todoCompleted(todo){
@@ -168,13 +162,11 @@ export default {
       this.$refs.showcompleteddesktop.classList.remove('active')
       },
     showActive(){
-      this.filterdTodoList = this.finalTodoList.filter(e => {
+      this.todoList = this.finalTodoList.filter(e => {
         if(!e.isCompleted){
           return e
         }
       })
-      this.activeTodoList = this.filterdTodoList
-      this.todoList = this.activeTodoList
       this.$refs.showactive.classList.add('active')
       this.$refs.showall.classList.remove('active')
       this.$refs.showcompleted.classList.remove('active')
@@ -184,12 +176,11 @@ export default {
       this.countingTodo()
     },
     showCompleted(){
-      this.filterdTodoList = this.finalTodoList.filter(e => {
+      this.todoList = this.finalTodoList.filter(e => {
         if(e.isCompleted){
           return e
         }
       })
-      this.todoList = this.filterdTodoList
       this.$refs.showactive.classList.remove('active')
       this.$refs.showall.classList.remove('active')
       this.$refs.showcompleted.classList.add('active')
@@ -199,20 +190,8 @@ export default {
     },
 
     deleteTodo(index){
-      //console.log(index, this.numOfTodo.length)
        this.todoList.splice(index, 1)
-      // this.finalTodoList.splice(index, 1);
       this.countingTodo()
-      // for(let i = 0; i < this.todoList; i++){
-      //   console.log(this.todoList[i])
-      //   this.todoList[i].splice(index, 1)
-      //   break;
-      // }
-
-      // for(let i = 0; i < this.finalTodoList; i++){
-      //   this.todoList[i].splice(index, 1)
-      //   break;
-      // }
     },
     countingTodo(){
       this.filterdTodoList = this.finalTodoList.filter(e => {
@@ -233,14 +212,12 @@ export default {
 
       if(this.$refs.showcompleteddesktop.classList.contains('active') || this.$refs.showcompleted.classList.contains('active')){
           this.todoList = []
-          this.filteredTodoList = this.finalTodoList.filter(e => {
+          this.finalodoList = this.finalTodoList.filter(e => {
             if(!e.isCompleted){
                 return e
               }
             })
-            this.finalTodoList = this.filteredTodoList
       }else{
-          // this.todoList = this.filteredTodoList
         this.finalTodoList = this.filteredTodoList
         this.todoList = this.finalTodoList
       }
