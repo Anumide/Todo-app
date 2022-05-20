@@ -2,6 +2,7 @@
 <div v-bind:class="theme" id="theme">
   <div class="jumbotron bg-primary">
     <div class="container">
+        <div class="error-message"> {{ errorMessage }}</div>
         <!-- for the todo logo and changing of theme  -->
       <div class="logoTheme">
         <h1 class="h1">TODO</h1>
@@ -51,9 +52,6 @@
     </div>
   </div>
 </div>
-{{todoList}}<br><br>
-{{filteredTodoList}}<br><br>
-{{finalTodoList}}
 </template>
 
 <script>
@@ -69,7 +67,8 @@ export default {
       activeTodoList: [],
       numOfTodo: [],
       todoNum: '0',
-      todoDummyObject: {}
+      todoDummyObject: {},
+      errorMessage: 'error!'
     }
   },
   methods:{
@@ -87,33 +86,28 @@ export default {
       }
     },
     addTodo(){      
-          
       if(!this.finalTodoList.length == 0){
         if(!this.todoItem == ''){
-          for(let x = 0; x < this.finalTodoList.length; x++){
-            if(!(this.todoItem.toLowerCase() == this.finalTodoList[x].name.toLowerCase())){
               if(this.$refs.showcompleteddesktop.classList.contains('active') || this.$refs.showcompleted.classList.contains('active')){
                 this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
                 this.finalTodoList.push(this.todoDummyObject)
                 this.todoItem = ''
-                this.countingTodo() 
-                console.log(this.finalTodoList[x].name)
+                this.countingTodo()
                 return
               }else{
                 this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
-                this.finalTodoList.push(this.todoDummyObject)
-                this.todoList = this.finalTodoList
-                this.todoItem = ''
-                this.countingTodo() 
-                console.log(this.finalTodoList[x].name)
-                return
-              }
-              
-            }
-            console.log('task already exist')
-            this.todoItem = ''
-          }
-          return
+                let todos = this.finalTodoList.map(todo => todo.name);
+                if(!todos.includes(this.todoDummyObject.name)){
+                    this.finalTodoList.push(this.todoDummyObject)
+                    this.todoItem = ''
+                    this.countingTodo()
+                    return
+                }
+                    console.log('task already exist!')
+                    this.todoItem = ''
+                    return
+                
+              }                
         }
           console.log('enter an input!')
       }else{
@@ -122,6 +116,7 @@ export default {
             if(this.$refs.showcompleteddesktop.classList.contains('active') ||  this.$refs.showcompleted.classList.contains('active')){
               this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
               this.finalTodoList.push(this.todoDummyObject)
+              this.countingTodo()
               return
           }else{
             this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
@@ -281,6 +276,16 @@ export default {
 
 }
 
+.error-message{
+    position: absolute;
+    background-color: #000;
+    color: #fff;
+    width: 500px;
+    top: 2%;
+    text-align: center;
+    border-radius: 5px;
+}
+
 .h1{
   font-size: 2.5rem;
   font-weight: 900;
@@ -289,7 +294,6 @@ export default {
 }
 
 .themeImage{
-  /* content: var(--themeImage); */
   background: var(--themeImage) no-repeat;
   background-size: contain;
   transition: background 500ms;
@@ -494,7 +498,7 @@ export default {
 }
 
 @media screen and (max-width: 550px){
-  .container{
+  .container, .error-message{
     width: 100%;
   }
 
