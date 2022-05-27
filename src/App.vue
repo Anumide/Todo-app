@@ -2,7 +2,7 @@
 <div v-bind:class="theme" id="theme">
   <div class="jumbotron bg-primary">
     <div class="container">
-        <div class="error-message"> {{ errorMessage }}</div>
+        <div class="error-message" :class="{'error-message-display': errorMessage}"> {{ errorMessage }}</div>
         <!-- for the todo logo and changing of theme  -->
       <div class="logoTheme">
         <h1 class="h1">TODO</h1>
@@ -19,7 +19,7 @@
         <div class="individualTodoList" v-for="(todo, index) in todoList" v-bind:key="todo">
         <span>
           <label v-if="!todo.editable" @dblclick="isEditable(todo)" for="todocheckbox" class="todoText" v-bind:class="{completed: todo.isCompleted}">{{todo.name}}</label>
-          <input v-else type="text" v-model="todo.name" id="todoTextEdit" @keydown.enter="editCompleted(todo)" @blur="editCompleted(todo)" @focusout="editCompleted(todo)">
+          <input v-else type="text" v-model="editedText" id="todoTextEdit" @keydown.enter="editCompleted(todo)" @blur="editCompleted(todo)" @focusout="editCompleted(todo)">
         </span>
         <span class="checkbox" @click="todoCompleted(todo)" v-bind:class="{completed: todo.isCompleted}">
             <img src="./assets/images/icon-check.svg" alt="">
@@ -52,6 +52,8 @@
     </div>
   </div>
 </div>
+{{ todoList }} <br><br>
+{{ finalTodoList }}
 </template>
 
 <script>
@@ -62,14 +64,24 @@ export default {
       theme: 'lightTheme',
       todoItem: '',
       todoList: [],
-      filteredTodoList: [],
       finalTodoList: [],
-      activeTodoList: [],
       numOfTodo: [],
       todoNum: '0',
       todoDummyObject: {},
-      errorMessage: 'error!'
+      errorMessage: '',
+      editedText: ''
     }
+  },
+  created(){
+    if(localStorage.todoList){
+      this.todoList = JSON.parse(localStorage.todoList);
+      this.finalTodoList = JSON.parse(localStorage.todoList);
+      this.numOfTodo = this.todoList.length;
+      this.todoNum = this.numOfTodo;
+    }
+
+    this.theme = localStorage.theme
+
   },
   methods:{
     todoObject(obj, id){
@@ -81,8 +93,10 @@ export default {
     changeTheme(){
       if(this.theme === 'lightTheme'){
         this.theme = 'darkTheme'
+        localStorage.theme = this.theme;
       } else{
         this.theme = 'lightTheme'
+        localStorage.theme = this.theme;
       }
     },
     addTodo(){      
@@ -90,64 +104,107 @@ export default {
         if(!this.todoItem == ''){
               if(this.$refs.showcompleteddesktop.classList.contains('active') || this.$refs.showcompleted.classList.contains('active')){
                 this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
-                this.finalTodoList.push(this.todoDummyObject)
-                this.todoItem = ''
-                this.countingTodo()
-                return
+                let todos = this.finalTodoList.map(todo => todo.name);
+                if(!todos.includes(this.todoDummyObject.name)){
+                  this.finalTodoList.push(this.todoDummyObject)
+                  localStorage.todoList = JSON.stringify(this.finalTodoList)
+                  this.finalTodoList = JSON.parse(localStorage.todoList)
+                  this.todoItem = ''
+                  this.countingTodo()
+                  return
+                }
+                    this.errorMessage = 'task already exist!'
+                    setTimeout(() => {
+                      this.errorMessage = ''
+                    }, 2000);
+                    return
               }else{
                 this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
                 let todos = this.finalTodoList.map(todo => todo.name);
                 if(!todos.includes(this.todoDummyObject.name)){
                     this.finalTodoList.push(this.todoDummyObject)
+                    localStorage.todoList = JSON.stringify(this.finalTodoList)
+                    this.finalTodoList = JSON.parse(localStorage.todoList)
+                    this.todoList = this.finalTodoList
                     this.todoItem = ''
                     this.countingTodo()
                     return
                 }
-                    console.log('task already exist!')
-                    this.todoItem = ''
+                    this.errorMessage = 'task already exist!'
+                    setTimeout(() => {
+                      this.errorMessage = ''
+                    }, 2000);
                     return
                 
               }                
         }
-          console.log('enter an input!')
+          this.errorMessage = 'enter an input!'
+          setTimeout(() => {
+            this.errorMessage = ''
+          }, 2000);
       }else{
 
       if(!this.todoItem == ''){
             if(this.$refs.showcompleteddesktop.classList.contains('active') ||  this.$refs.showcompleted.classList.contains('active')){
               this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
               this.finalTodoList.push(this.todoDummyObject)
+              localStorage.todoList = JSON.stringify(this.finalTodoList)
+              this.finalTodoList = JSON.parse(localStorage.todoList)
               this.countingTodo()
               return
           }else{
             this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
             this.finalTodoList.push(this.todoDummyObject)
+            localStorage.todoList = JSON.stringify(this.finalTodoList)
+            this.finalTodoList = JSON.parse(localStorage.todoList)
             this.todoList = this.finalTodoList
           }
           this.todoItem = ''
           this.countingTodo() 
           return
         }
-          console.log('enter an input!')
+         this.errorMessage = 'enter an input!'
+          setTimeout(() => {
+            this.errorMessage = ''
+          }, 2000);
       }
     },
     todoCompleted(todo){
-      if(!todo.isCompleted){
-        todo.isCompleted = true
-      } else{
-        todo.isCompleted = false
-      }
+      todo.isCompleted = !todo.isCompleted
       this.countingTodo()
-      if(this.$refs.showactivedesktop.classList.contains('active')){
+      if(this.$refs.showactivedesktop.classList.contains('active') || this.$refs.showactive.classList.contains('active')){
         this.showActive()
       }
     },
     isEditable(todo){
+      this.editedText = todo.name 
+      todo.name = ''
       todo.editable = true;
     },
     editCompleted(todo){
-      todo.editable = false;
+      let todos = this.finalTodoList.map(todo => todo.name)
+        if(!todos.includes(this.editedText)){
+          todo.name = this.editedText
+          todo.editable = false;
+          return
+        }else if(this.editedText ==''){
+          this.errorMessage = 'enter an input!'
+            setTimeout(() => {
+              this.errorMessage = ''
+            }, 2000);
+            return
+        }else{
+          this.errorMessage = 'task already exist!'
+          console.log('working')
+          setTimeout(() => {
+            this.errorMessage = ''
+          }, 2000);
+          return
+        }
+            
     },
     showAll(){
+      this.finalTodoList = JSON.parse(localStorage.todoList)
       this.todoList = this.finalTodoList
       this.$refs.showactive.classList.remove('active')
       this.$refs.showall.classList.add('active')
@@ -157,6 +214,7 @@ export default {
       this.$refs.showcompleteddesktop.classList.remove('active')
       },
     showActive(){
+      this.finalTodoList = JSON.parse(localStorage.todoList)
       this.todoList = this.finalTodoList.filter(e => {
         if(!e.isCompleted){
           return e
@@ -171,6 +229,7 @@ export default {
       this.countingTodo()
     },
     showCompleted(){
+      this.finalTodoList = JSON.parse(localStorage.todoList)
       this.todoList = this.finalTodoList.filter(e => {
         if(e.isCompleted){
           return e
@@ -185,21 +244,33 @@ export default {
     },
 
     deleteTodo(index){
-       this.todoList.splice(index, 1)
+      if(this.$refs.showall.classList.contains('active') || this.$refs.showalldesktop.classList.contains('active')){
+        this.finalTodoList.splice(index, 1)
+        localStorage.todoList = JSON.stringify(this.finalTodoList)
+        this.finalTodoList = JSON.parse(localStorage.todoList)
+        this.todoList = this.finalTodoList
+        this.countingTodo()
+        return
+      }
+      this.todoList.splice(index, 1)
+      this.finalTodoList.splice(index, 1)
+      localStorage.todoList = JSON.stringify(this.finalTodoList)
+      this.finalTodoList = JSON.parse(localStorage.todoList)
       this.countingTodo()
     },
     countingTodo(){
-      this.filterdTodoList = this.finalTodoList.filter(e => {
+      this.finalTodoList = JSON.parse(localStorage.todoList)
+      let filterdTodoList = this.finalTodoList.filter(e => {
         if(!e.isCompleted){
           return e
         }
       })
-      this.numOfTodo = this.filterdTodoList
+      this.numOfTodo = filterdTodoList
       this.todoNum = parseInt(this.numOfTodo.length)
     },
     clearComplete(){
      
-      this.filteredTodoList = this.todoList.filter(e => {
+      let filteredTodoList = this.todoList.filter(e => {
         if(!e.isCompleted){
           return e
         }
@@ -207,14 +278,15 @@ export default {
 
       if(this.$refs.showcompleteddesktop.classList.contains('active') || this.$refs.showcompleted.classList.contains('active')){
           this.todoList = []
-          this.finalodoList = this.finalTodoList.filter(e => {
+          this.finalTodoList = this.finalTodoList.filter(e => {
             if(!e.isCompleted){
                 return e
               }
             })
       }else{
-        this.finalTodoList = this.filteredTodoList
+        this.finalTodoList = filteredTodoList
         this.todoList = this.finalTodoList
+        localStorage.todoList = JSON.stringify(this.finalTodoList)
       }
     }
 
@@ -248,6 +320,7 @@ export default {
 
 #theme{
   height: 100vh;
+  overflow: auto;
   background-color: var(--bodyBackgroundColor);
   transition: background-color 500ms;
 }
@@ -278,12 +351,18 @@ export default {
 
 .error-message{
     position: absolute;
-    background-color: #000;
-    color: #fff;
-    width: 500px;
-    top: 2%;
+    background-color: var(--bodyBackgroundColor);
+    color: var(--todoTextColor);
+    width: 480px;
+    top: -6%;
+    transform: rotateX(180deg);
     text-align: center;
     border-radius: 5px;
+    box-shadow: 0 0 15px 1px rgb(0 0 0 / 30%);
+}
+
+.error-message-display{
+  animation: slide-down 550ms ease-out forwards;
 }
 
 .h1{
@@ -371,7 +450,6 @@ export default {
 
 #todoTextEdit{
   display: inline-block;
-  /* margin-left: 10px; */
   visibility: visible;
 }
 
@@ -498,8 +576,12 @@ export default {
 }
 
 @media screen and (max-width: 550px){
-  .container, .error-message{
+  .container{
     width: 100%;
+  }
+
+  .error-message{
+    width: 95%;
   }
 
   .jumbotron{
@@ -553,6 +635,13 @@ export default {
     color: var(--todoTextColor);
   }
 
+}
+
+@keyframes slide-down{
+  to{
+    top: 2%;
+    transform: rotateX(0deg);
+  }
 }
 
 </style>
