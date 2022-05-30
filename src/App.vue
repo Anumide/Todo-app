@@ -21,7 +21,7 @@
           <label v-if="!todo.editable" @dblclick="isEditable(todo)" for="todocheckbox" class="todoText" v-bind:class="{completed: todo.isCompleted}">{{todo.name}}</label>
           <input v-else type="text" v-model="editedText" id="todoTextEdit" @keydown.enter="editCompleted(todo)" @blur="editCompleted(todo)" @focusout="editCompleted(todo)">
         </span>
-        <span class="checkbox" @click="todoCompleted(todo)" v-bind:class="{completed: todo.isCompleted}">
+        <span class="checkbox" @click="todoCompleted(todo, index)" v-bind:class="{completed: todo.isCompleted}">
             <img src="./assets/images/icon-check.svg" alt="">
         </span>
         <!-- delete todo -->
@@ -169,11 +169,41 @@ export default {
           }, 2000);
       }
     },
-    todoCompleted(todo){
-      todo.isCompleted = !todo.isCompleted
-      this.countingTodo()
+    todoCompleted(todo, index){
+      if(this.$refs.showalldesktop.classList.contains('active') || this.$refs.showall.classList.contains('active')){
+        todo.isCompleted = !todo.isCompleted
+        this.finalTodoList[index] = todo
+        localStorage.todoList = JSON.stringify(this.finalTodoList)
+        this.finalTodoList = JSON.parse(localStorage.todoList)
+        this.countingTodo()
+      }
+      
       if(this.$refs.showactivedesktop.classList.contains('active') || this.$refs.showactive.classList.contains('active')){
-        this.showActive()
+         for(let i = 0; i < this.finalTodoList.length; i++){
+          if(this.finalTodoList[i].name == todo.name){
+            todo.isCompleted = true
+            this.finalTodoList[i].isCompleted = true
+            localStorage.todoList = JSON.stringify(this.finalTodoList)
+            this.finalTodoList = JSON.parse(localStorage.todoList)
+            this.showActive()
+            this.countingTodo()
+            return
+          }
+        }
+
+      }
+      if(this.$refs.showcompleteddesktop.classList.contains('active') || this.$refs.showcompleted.classList.contains('active')){
+        for(let i = 0; i < this.finalTodoList.length; i++){
+          if(this.finalTodoList[i].name == todo.name){
+            todo.isCompleted = false
+            this.finalTodoList[i].isCompleted = false
+            localStorage.todoList = JSON.stringify(this.finalTodoList)
+            this.finalTodoList = JSON.parse(localStorage.todoList)
+            this.showCompleted()
+            this.countingTodo()
+            return
+          }
+        }
       }
     },
     isEditable(todo){
@@ -265,8 +295,7 @@ export default {
           return e
         }
       })
-      this.numOfTodo = filterdTodoList
-      this.todoNum = parseInt(this.numOfTodo.length)
+      this.todoNum = parseInt(filterdTodoList.length)
     },
     clearComplete(){
      
@@ -278,15 +307,14 @@ export default {
 
       if(this.$refs.showcompleteddesktop.classList.contains('active') || this.$refs.showcompleted.classList.contains('active')){
           this.todoList = []
-          this.finalTodoList = this.finalTodoList.filter(e => {
-            if(!e.isCompleted){
-                return e
-              }
-            })
+          this.finalTodoList = this.finalTodoList.filter(e => !e.isCompleted)
+          localStorage.todoList = JSON.stringify(this.finalTodoList)
+          this.countingTodo()
       }else{
         this.finalTodoList = filteredTodoList
         this.todoList = this.finalTodoList
         localStorage.todoList = JSON.stringify(this.finalTodoList)
+        this.countingTodo()
       }
     }
 
