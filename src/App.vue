@@ -207,16 +207,31 @@ export default {
       }
     },
     isEditable(todo){
-      this.editedText = todo.name 
-      todo.name = ''
-      todo.editable = true;
+      for(let i = 0; i < this.finalTodoList.length; i++){
+        if(this.finalTodoList[i].name == todo.name){
+          this.editedText = todo.name 
+          todo.name = ''
+          this.finalTodoList[i].name = ''
+          todo.editable = true;
+          this.finalTodoList[i].editable = true
+          return
+        }
+      }
     },
     editCompleted(todo){
       let todos = this.finalTodoList.map(todo => todo.name)
         if(!todos.includes(this.editedText)){
-          todo.name = this.editedText
-          todo.editable = false;
-          return
+          for(let i = 0; i < this.finalTodoList.length; i++){
+            if(this.finalTodoList[i].name == todo.name){
+              todo.name = this.editedText
+              this.finalTodoList[i].name = this.editedText
+              todo.editable = false;
+              this.finalTodoList[i].editable = false
+              localStorage.todoList = JSON.stringify(this.finalTodoList)
+              this.finalTodoList = JSON.parse(localStorage.todoList)
+              return
+            }
+          }
         }else if(this.editedText ==''){
           this.errorMessage = 'enter an input!'
             setTimeout(() => {
@@ -298,12 +313,14 @@ export default {
       this.todoNum = parseInt(filterdTodoList.length)
     },
     clearComplete(){
-     
-      let filteredTodoList = this.todoList.filter(e => {
-        if(!e.isCompleted){
-          return e
-        }
-      })
+      let filteredTodoList = this.finalTodoList.filter(e => e.isCompleted) 
+      if(filteredTodoList.length == 0){
+        this.errorMessage = 'No completed task!'
+        setTimeout(() => {
+            this.errorMessage = ''
+          }, 2000);
+        return
+      }  
 
       if(this.$refs.showcompleteddesktop.classList.contains('active') || this.$refs.showcompleted.classList.contains('active')){
           this.todoList = []
@@ -311,11 +328,13 @@ export default {
           localStorage.todoList = JSON.stringify(this.finalTodoList)
           this.countingTodo()
       }else{
-        this.finalTodoList = filteredTodoList
+        this.finalTodoList = this.todoList.filter(e => !e.isCompleted)
         this.todoList = this.finalTodoList
         localStorage.todoList = JSON.stringify(this.finalTodoList)
         this.countingTodo()
       }
+
+
     }
 
   }
