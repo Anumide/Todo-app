@@ -16,19 +16,27 @@
       <!-- list of new todos -->
     <div class="todoList">
       <div class="subTodoList">
-        <div class="individualTodoList" v-for="(todo, index) in todoList" v-bind:key="todo">
-        <span>
-          <label v-if="!todo.editable" @dblclick="isEditable(todo)" for="todocheckbox" class="todoText" v-bind:class="{completed: todo.isCompleted}">{{todo.name}}</label>
-          <input v-else type="text" v-model="editedText" id="todoTextEdit" @keydown.enter="editCompleted(todo)" @blur="editCompleted(todo)" @focusout="editCompleted(todo)">
-        </span>
-        <span class="checkbox" @click="todoCompleted(todo, index)" v-bind:class="{completed: todo.isCompleted}">
-            <img src="./assets/images/icon-check.svg" alt="">
-        </span>
-        <!-- delete todo -->
-        <span class="deleteTodo" @click="deleteTodo(index)">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"><path fill="#494C6B" fill-rule="evenodd" d="M16.97 0l.708.707L9.546 8.84l8.132 8.132-.707.707-8.132-8.132-8.132 8.132L0 16.97l8.132-8.132L0 .707.707 0 8.84 8.132 16.971 0z"/></svg>
-        </span>
-      </div>
+        <draggable v-model="todoList" 
+          group="tasks" 
+          @start="drag=true" 
+          @end="drag=false" 
+          item-key="todo">
+         <template #item="{ element, index }">
+          <div class="individualTodoList">
+            <span>
+              <label v-if="!element.editable" @dblclick="isEditable(element)" for="todocheckbox" class="todoText" v-bind:class="{completed: element.isCompleted}">{{element.name}}</label>
+              <input v-else type="text" v-model="editedText" id="todoTextEdit" @keydown.enter="editCompleted(element)" @blur="editCompleted(element)" @focusout="editCompleted(element)">
+            </span>
+            <span class="checkbox" @click="todoCompleted(element, index)" v-bind:class="{completed: element.isCompleted}">
+                <img src="./assets/images/icon-check.svg" alt="">
+            </span>
+            
+            <span class="deleteTodo" @click="deleteTodo(index)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"><path fill="#494C6B" fill-rule="evenodd" d="M16.97 0l.708.707L9.546 8.84l8.132 8.132-.707.707-8.132-8.132-8.132 8.132L0 16.97l8.132-8.132L0 .707.707 0 8.84 8.132 16.971 0z"/></svg>
+            </span>
+          </div>
+         </template>
+        </draggable>
       </div>
       <!-- todo sublinks -->
     <div class="todoFootLinks">
@@ -57,10 +65,15 @@
 </template>
 
 <script>
+import draggable from 'vuedraggable';
 
 export default {
+  components: { 
+    draggable,
+  },
   data(){
     return{
+      drag: true,
       theme: 'lightTheme',
       todoItem: '',
       todoList: [],
@@ -82,6 +95,9 @@ export default {
 
     this.theme = localStorage.theme
 
+  },
+  updated(){
+    console.log('updated!')
   },
   methods:{
     todoObject(obj, id){
@@ -220,7 +236,21 @@ export default {
     },
     editCompleted(todo){
       let todos = this.finalTodoList.map(todo => todo.name)
-        if(!todos.includes(this.editedText)){
+        if(todos.includes(this.editedText)){
+          this.errorMessage = 'task already exist!'
+          console.log('working')
+          setTimeout(() => {
+            this.errorMessage = ''
+          }, 2000);
+          return
+          
+        }else if(this.editedText ==''){
+          this.errorMessage = 'enter an input!'
+            setTimeout(() => {
+              this.errorMessage = ''
+            }, 2000);
+            return
+        }else{
           for(let i = 0; i < this.finalTodoList.length; i++){
             if(this.finalTodoList[i].name == todo.name){
               todo.name = this.editedText
@@ -232,19 +262,6 @@ export default {
               return
             }
           }
-        }else if(this.editedText ==''){
-          this.errorMessage = 'enter an input!'
-            setTimeout(() => {
-              this.errorMessage = ''
-            }, 2000);
-            return
-        }else{
-          this.errorMessage = 'task already exist!'
-          console.log('working')
-          setTimeout(() => {
-            this.errorMessage = ''
-          }, 2000);
-          return
         }
             
     },
@@ -359,6 +376,7 @@ export default {
 .darkTheme{
   --bodyBackgroundColor: hsl(235, 21%, 11%);
   --todoBackgroundColor: hsl(235, 24%, 19%);
+  --lineThroughTextColor: hsl(234, 15%, 61%);
    --todoTextColor: hsl(234, 39%, 85%);
    --jumbotronBackground: url('./assets/images/bg-desktop-dark.jpg');
    --mobilejumbotronBackground: url('./assets/images/bg-mobile-dark.jpg');
