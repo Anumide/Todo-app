@@ -16,11 +16,12 @@
       <!-- list of new todos -->
     <div class="todoList">
       <div class="subTodoList">
-        <draggable v-model="todoList" 
+        <draggable v-model="todoList"
           group="tasks" 
           @start="drag=true" 
           @end="drag=false" 
-          item-key="todo">
+          item-key="todo"
+          >
          <template #item="{ element, index }">
           <div class="individualTodoList">
             <span>
@@ -31,7 +32,7 @@
                 <img src="./assets/images/icon-check.svg" alt="">
             </span>
             
-            <span class="deleteTodo" @click="deleteTodo(index)">
+            <span class="deleteTodo" @click="deleteTodo(element, index)">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"><path fill="#494C6B" fill-rule="evenodd" d="M16.97 0l.708.707L9.546 8.84l8.132 8.132-.707.707-8.132-8.132-8.132 8.132L0 16.97l8.132-8.132L0 .707.707 0 8.84 8.132 16.971 0z"/></svg>
             </span>
           </div>
@@ -92,12 +93,16 @@ export default {
       this.numOfTodo = this.todoList.length;
       this.todoNum = this.numOfTodo;
     }
-
+    this.countingTodo();
     this.theme = localStorage.theme
 
   },
-  updated(){
-    console.log('updated!')
+  beforeUpdate(){
+    if(this.$refs.showalldesktop.classList.contains('active') || this.$refs.showall.classList.contains('active')){
+      this.finalTodoList = this.todoList
+      localStorage.todoList = JSON.stringify(this.finalTodoList);
+      this.countingTodo();
+    }
   },
   methods:{
     todoObject(obj, id){
@@ -134,6 +139,25 @@ export default {
                       this.errorMessage = ''
                     }, 2000);
                     return
+              }else if(this.$refs.showactivedesktop.classList.contains('active') || this.$refs.showactive.classList.contains('active')){
+                this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
+                let todos = this.finalTodoList.map(todo => todo.name);
+                if(!todos.includes(this.todoDummyObject.name)){
+                    this.finalTodoList.push(this.todoDummyObject)
+                    localStorage.todoList = JSON.stringify(this.finalTodoList)
+                    this.finalTodoList = JSON.parse(localStorage.todoList)
+                    this.todoList = this.finalTodoList
+                    this.todoItem = ''
+                    this.showActive()
+                    this.countingTodo()
+                    return
+                }
+                    this.errorMessage = 'task already exist!'
+                    setTimeout(() => {
+                      this.errorMessage = ''
+                    }, 2000);
+                    return
+                
               }else{
                 this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
                 let todos = this.finalTodoList.map(todo => todo.name);
@@ -151,8 +175,7 @@ export default {
                       this.errorMessage = ''
                     }, 2000);
                     return
-                
-              }                
+              }        
         }
           this.errorMessage = 'enter an input!'
           setTimeout(() => {
@@ -223,6 +246,8 @@ export default {
       }
     },
     isEditable(todo){
+       let todos = this.finalTodoList.map(todo => todo.name)
+       console.log(todos)
       for(let i = 0; i < this.finalTodoList.length; i++){
         if(this.finalTodoList[i].name == todo.name){
           this.editedText = todo.name 
@@ -239,6 +264,7 @@ export default {
         if(todos.includes(this.editedText)){
           this.errorMessage = 'task already exist!'
           console.log('working')
+          console.log(todos)
           setTimeout(() => {
             this.errorMessage = ''
           }, 2000);
@@ -289,6 +315,7 @@ export default {
       this.$refs.showalldesktop.classList.remove('active')
       this.$refs.showcompleteddesktop.classList.remove('active')
       this.countingTodo()
+      this.drag = false
     },
     showCompleted(){
       this.finalTodoList = JSON.parse(localStorage.todoList)
@@ -303,9 +330,10 @@ export default {
       this.$refs.showactivedesktop.classList.remove('active')
       this.$refs.showalldesktop.classList.remove('active')
       this.$refs.showcompleteddesktop.classList.add('active')
+      this.drag = false
     },
 
-    deleteTodo(index){
+    deleteTodo(todo, index){
       if(this.$refs.showall.classList.contains('active') || this.$refs.showalldesktop.classList.contains('active')){
         this.finalTodoList.splice(index, 1)
         localStorage.todoList = JSON.stringify(this.finalTodoList)
@@ -313,12 +341,24 @@ export default {
         this.todoList = this.finalTodoList
         this.countingTodo()
         return
+      }else{
+        for(let i = 0; i < this.finalTodoList.length; i++){
+          if(this.finalTodoList[i].name == todo.name){
+            this.todoList.splice(index, 1)
+            this.finalTodoList.splice(i, 1)
+            localStorage.todoList = JSON.stringify(this.finalTodoList)
+            this.finalTodoList = JSON.parse(localStorage.todoList)
+            this.countingTodo()
+            return
+          }
+        }
       }
-      this.todoList.splice(index, 1)
-      this.finalTodoList.splice(index, 1)
-      localStorage.todoList = JSON.stringify(this.finalTodoList)
-      this.finalTodoList = JSON.parse(localStorage.todoList)
-      this.countingTodo()
+      // this.todoList.splice(index, 1)
+      // this.finalTodoList.splice(index, 1)
+      // localStorage.todoList = JSON.stringify(this.finalTodoList)
+      // this.finalTodoList = JSON.parse(localStorage.todoList)
+      // this.countingTodo()
+        
     },
     countingTodo(){
       this.finalTodoList = JSON.parse(localStorage.todoList)
@@ -638,6 +678,21 @@ export default {
   text-align: center;
   opacity: .7;
   color: var(--textColor);
+}
+
+.list-enter-active,
+.list-leave-active{
+  transition: all 500ms ease;
+}
+
+.list-enter-from{
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.list-leave-to{
+  opacity: 0;
+  transform: translateX(30px);
 }
 
 @media screen and (max-width: 550px){
