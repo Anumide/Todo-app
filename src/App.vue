@@ -21,11 +21,11 @@
           @start="drag=true" 
           @end="drag=false" 
           item-key="todo"
-          >
+          :disabled="!enabled">
          <template #item="{ element, index }">
           <div class="individualTodoList">
             <span>
-              <label v-if="!element.editable" @dblclick="isEditable(element)" for="todocheckbox" class="todoText" v-bind:class="{completed: element.isCompleted}">{{element.name}}</label>
+              <label v-if="!element.editable" @dblclick="isEditable(element, index)" for="todocheckbox" class="todoText" v-bind:class="{completed: element.isCompleted}">{{element.name}}</label>
               <input v-else type="text" v-model="editedText" id="todoTextEdit" @keydown.enter="editCompleted(element)" @blur="editCompleted(element)" @focusout="editCompleted(element)">
             </span>
             <span class="checkbox" @click="todoCompleted(element, index)" v-bind:class="{completed: element.isCompleted}">
@@ -74,7 +74,7 @@ export default {
   },
   data(){
     return{
-      drag: true,
+      
       theme: 'lightTheme',
       todoItem: '',
       todoList: [],
@@ -83,18 +83,25 @@ export default {
       todoNum: '0',
       todoDummyObject: {},
       errorMessage: '',
-      editedText: ''
+      editedText: '',
+      todos: [],
+      enabled: true,
     }
   },
   created(){
+    this.theme = localStorage.theme
     if(localStorage.todoList){
       this.todoList = JSON.parse(localStorage.todoList);
       this.finalTodoList = JSON.parse(localStorage.todoList);
       this.numOfTodo = this.todoList.length;
       this.todoNum = this.numOfTodo;
+        this.countingTodo();
     }
-    this.countingTodo();
-    this.theme = localStorage.theme
+
+    if(localStorage.todos){
+      this.todos = JSON.parse(localStorage.todos);
+    }
+
 
   },
   beforeUpdate(){
@@ -103,6 +110,9 @@ export default {
       localStorage.todoList = JSON.stringify(this.finalTodoList);
       this.countingTodo();
     }
+  },
+  updated(){
+    localStorage.todos = JSON.stringify(this.todos)
   },
   methods:{
     todoObject(obj, id){
@@ -126,7 +136,8 @@ export default {
               if(this.$refs.showcompleteddesktop.classList.contains('active') || this.$refs.showcompleted.classList.contains('active')){
                 this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
                 let todos = this.finalTodoList.map(todo => todo.name);
-                if(!todos.includes(this.todoDummyObject.name)){
+                todos = todos.map(todo => todo.toLowerCase())
+                if(!todos.includes(this.todoDummyObject.name.toLowerCase())){
                   this.finalTodoList.push(this.todoDummyObject)
                   localStorage.todoList = JSON.stringify(this.finalTodoList)
                   this.finalTodoList = JSON.parse(localStorage.todoList)
@@ -142,7 +153,8 @@ export default {
               }else if(this.$refs.showactivedesktop.classList.contains('active') || this.$refs.showactive.classList.contains('active')){
                 this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
                 let todos = this.finalTodoList.map(todo => todo.name);
-                if(!todos.includes(this.todoDummyObject.name)){
+                 todos = todos.map(todo => todo.toLowerCase())
+                if(!todos.includes(this.todoDummyObject.name.toLowerCase())){
                     this.finalTodoList.push(this.todoDummyObject)
                     localStorage.todoList = JSON.stringify(this.finalTodoList)
                     this.finalTodoList = JSON.parse(localStorage.todoList)
@@ -161,7 +173,8 @@ export default {
               }else{
                 this.todoDummyObject = new this.todoObject(this.todoItem, this.id)
                 let todos = this.finalTodoList.map(todo => todo.name);
-                if(!todos.includes(this.todoDummyObject.name)){
+                 todos = todos.map(todo => todo.toLowerCase())
+                if(!todos.includes(this.todoDummyObject.name.toLowerCase())){
                     this.finalTodoList.push(this.todoDummyObject)
                     localStorage.todoList = JSON.stringify(this.finalTodoList)
                     this.finalTodoList = JSON.parse(localStorage.todoList)
@@ -245,9 +258,14 @@ export default {
         }
       }
     },
-    isEditable(todo){
-       let todos = this.finalTodoList.map(todo => todo.name)
-       console.log(todos)
+    isEditable(todo, index){
+      if(this.$refs.showactivedesktop.classList.contains('active') || this.$refs.showactive.classList.contains('active')){
+        todo.isEditable = false
+        return
+      }
+       this.todos = this.finalTodoList.map(todo => todo.name)
+       this.todos[index] = ''
+       console.log(this.todos)
       for(let i = 0; i < this.finalTodoList.length; i++){
         if(this.finalTodoList[i].name == todo.name){
           this.editedText = todo.name 
@@ -259,24 +277,8 @@ export default {
         }
       }
     },
-    editCompleted(todo){
-      let todos = this.finalTodoList.map(todo => todo.name)
-        if(todos.includes(this.editedText)){
-          this.errorMessage = 'task already exist!'
-          console.log('working')
-          console.log(todos)
-          setTimeout(() => {
-            this.errorMessage = ''
-          }, 2000);
-          return
-          
-        }else if(this.editedText ==''){
-          this.errorMessage = 'enter an input!'
-            setTimeout(() => {
-              this.errorMessage = ''
-            }, 2000);
-            return
-        }else{
+    editCompleted(todo){ 
+        if(!this.todos.includes(this.editedText.toLowerCase())){
           for(let i = 0; i < this.finalTodoList.length; i++){
             if(this.finalTodoList[i].name == todo.name){
               todo.name = this.editedText
@@ -287,7 +289,21 @@ export default {
               this.finalTodoList = JSON.parse(localStorage.todoList)
               return
             }
-          }
+          }          
+        }else if(this.editedText ==''){
+          this.errorMessage = 'enter an input!'
+            setTimeout(() => {
+              this.errorMessage = ''
+            }, 2000);
+            return
+        }else{
+          this.errorMessage = 'task already exist!'
+          console.log('working')
+          console.log(this.todos)
+          setTimeout(() => {
+            this.errorMessage = ''
+          }, 2000);
+          return
         }
             
     },
@@ -300,6 +316,7 @@ export default {
       this.$refs.showactivedesktop.classList.remove('active')
       this.$refs.showalldesktop.classList.add('active')
       this.$refs.showcompleteddesktop.classList.remove('active')
+      this.enabled = true
       },
     showActive(){
       this.finalTodoList = JSON.parse(localStorage.todoList)
@@ -308,6 +325,8 @@ export default {
           return e
         }
       })
+      this.finalTodoList.forEach(e => e.isEditable = false)
+      this.todoList.forEach(e => e.isEditable = false)
       this.$refs.showactive.classList.add('active')
       this.$refs.showall.classList.remove('active')
       this.$refs.showcompleted.classList.remove('active')
@@ -315,7 +334,7 @@ export default {
       this.$refs.showalldesktop.classList.remove('active')
       this.$refs.showcompleteddesktop.classList.remove('active')
       this.countingTodo()
-      this.drag = false
+      this.enabled = false
     },
     showCompleted(){
       this.finalTodoList = JSON.parse(localStorage.todoList)
@@ -330,7 +349,7 @@ export default {
       this.$refs.showactivedesktop.classList.remove('active')
       this.$refs.showalldesktop.classList.remove('active')
       this.$refs.showcompleteddesktop.classList.add('active')
-      this.drag = false
+      this.enabled = false
     },
 
     deleteTodo(todo, index){
@@ -352,13 +371,7 @@ export default {
             return
           }
         }
-      }
-      // this.todoList.splice(index, 1)
-      // this.finalTodoList.splice(index, 1)
-      // localStorage.todoList = JSON.stringify(this.finalTodoList)
-      // this.finalTodoList = JSON.parse(localStorage.todoList)
-      // this.countingTodo()
-        
+      }        
     },
     countingTodo(){
       this.finalTodoList = JSON.parse(localStorage.todoList)
