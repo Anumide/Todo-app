@@ -7,7 +7,6 @@
       <div class="logoTheme">
         <h1 class="h1">TODO</h1>
         <span class="themeImage" @click ="changeTheme"></span>
-        <!-- <img @click ="changeTheme" class="themeImage" alt="change to dark or light theme"> -->
       </div>
           <!-- for adding new todo -->
     <div class="newTodo">
@@ -61,8 +60,6 @@
     </div>
   </div>
 </div>
-{{ todoList }} <br><br>
-{{ finalTodoList }}
 </template>
 
 <script>
@@ -265,7 +262,6 @@ export default {
       }
        this.todos = this.finalTodoList.map(todo => todo.name)
        this.todos[index] = ''
-       console.log(this.todos)
       for(let i = 0; i < this.finalTodoList.length; i++){
         if(this.finalTodoList[i].name == todo.name){
           this.editedText = todo.name 
@@ -298,8 +294,6 @@ export default {
             return
         }else{
           this.errorMessage = 'task already exist!'
-          console.log('working')
-          console.log(this.todos)
           setTimeout(() => {
             this.errorMessage = ''
           }, 2000);
@@ -434,6 +428,15 @@ export default {
    --jumbotronBackground: url('./assets/images/bg-desktop-dark.jpg');
    --mobilejumbotronBackground: url('./assets/images/bg-mobile-dark.jpg');
    --themeImage: url('./assets/images/icon-sun.svg');
+}
+
+::-webkit-scrollbar{
+  width: 5px;
+}
+
+::-webkit-scrollbar-thumb{
+  background-color: var(--todoBackgroundColor);
+  border-radius: 10px;
 }
 
 #theme{

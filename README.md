@@ -1,3 +1,6 @@
+
+# A Todo-app built with vue.js 3 and bootstrap
+
 # todo-app
 
 ## Project setup
@@ -22,3 +25,4 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
