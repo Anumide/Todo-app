@@ -139,6 +139,10 @@ export default {
                   localStorage.todoList = JSON.stringify(this.finalTodoList)
                   this.finalTodoList = JSON.parse(localStorage.todoList)
                   this.todoItem = ''
+                  this.errorMessage ='task added successfully!'
+                  setTimeout(() => {
+                      this.errorMessage = ''
+                    }, 2000);
                   this.countingTodo()
                   return
                 }
@@ -157,6 +161,10 @@ export default {
                     this.finalTodoList = JSON.parse(localStorage.todoList)
                     this.todoList = this.finalTodoList
                     this.todoItem = ''
+                    this.errorMessage ='task added successfully!'
+                  setTimeout(() => {
+                      this.errorMessage = ''
+                    }, 2000);
                     this.showActive()
                     this.countingTodo()
                     return
@@ -177,6 +185,10 @@ export default {
                     this.finalTodoList = JSON.parse(localStorage.todoList)
                     this.todoList = this.finalTodoList
                     this.todoItem = ''
+                    this.errorMessage ='task added successfully!'
+                  setTimeout(() => {
+                      this.errorMessage = ''
+                    }, 2000);
                     this.countingTodo()
                     return
                 }
@@ -199,6 +211,10 @@ export default {
               this.finalTodoList.push(this.todoDummyObject)
               localStorage.todoList = JSON.stringify(this.finalTodoList)
               this.finalTodoList = JSON.parse(localStorage.todoList)
+              this.errorMessage ='task added successfully!'
+                  setTimeout(() => {
+                      this.errorMessage = ''
+                    }, 2000);
               this.countingTodo()
               return
           }else{
@@ -207,6 +223,10 @@ export default {
             localStorage.todoList = JSON.stringify(this.finalTodoList)
             this.finalTodoList = JSON.parse(localStorage.todoList)
             this.todoList = this.finalTodoList
+            this.errorMessage ='task added successfully!'
+                  setTimeout(() => {
+                      this.errorMessage = ''
+                    }, 2000);
           }
           this.todoItem = ''
           this.countingTodo() 
@@ -733,6 +753,10 @@ export default {
     width: 90%;
     margin: 4em auto 1.2em auto;
   }
+
+.deleteTodo{
+  opacity: 1;
+}
 
   .todoList{
     width: 90%;
