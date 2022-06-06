@@ -10,7 +10,8 @@
       </div>
           <!-- for adding new todo -->
     <div class="newTodo">
-      <input type="text" required placeholder="Create a new todo..." @keydown.enter="addTodo" v-model="todoItem">
+      <input type="text" required placeholder="Create a new todo..." @keypress.enter="addTodo" v-model="todoItem">
+      <span class="newTodoBtn" @click="addTodo"><span class="iconify" data-icon="fluent:add-12-filled" ></span></span>
     </div>
       <!-- list of new todos -->
     <div class="todoList">
@@ -25,7 +26,7 @@
           <div class="individualTodoList">
             <span>
               <label v-if="!element.editable" @dblclick="isEditable(element, index)" for="todocheckbox" class="todoText" v-bind:class="{completed: element.isCompleted}">{{element.name}}</label>
-              <input v-else type="text" v-model="editedText" id="todoTextEdit" @keydown.enter="editCompleted(element)" @blur="editCompleted(element)" @focusout="editCompleted(element)">
+              <input v-else type="text" v-model="editedText" id="todoTextEdit" @keypress="editCompleted(element)" @blur="editCompleted(element)" @focusout="editCompleted(element)">
             </span>
             <span class="checkbox" @click="todoCompleted(element, index)" v-bind:class="{completed: element.isCompleted}">
                 <img src="./assets/images/icon-check.svg" alt="">
@@ -147,6 +148,7 @@ export default {
                   return
                 }
                     this.errorMessage = 'task already exist!'
+                    this.todoItem = ''
                     setTimeout(() => {
                       this.errorMessage = ''
                     }, 2000);
@@ -170,6 +172,7 @@ export default {
                     return
                 }
                     this.errorMessage = 'task already exist!'
+                    this.todoItem = ''
                     setTimeout(() => {
                       this.errorMessage = ''
                     }, 2000);
@@ -193,6 +196,7 @@ export default {
                     return
                 }
                     this.errorMessage = 'task already exist!'
+                    this.todoItem = ''
                     setTimeout(() => {
                       this.errorMessage = ''
                     }, 2000);
@@ -306,7 +310,7 @@ export default {
               return
             }
           }          
-        }else if(this.editedText ==''){
+        }else if(this.editedText == ''){
           this.errorMessage = 'enter an input!'
             setTimeout(() => {
               this.errorMessage = ''
@@ -523,6 +527,22 @@ export default {
 
 .newTodo{
   margin: 3em 0 1.2em 0;
+  display: flex;
+  align-items: center;
+}
+
+.newTodoBtn{
+  font-size: 1.5rem;
+  margin-left: 5px;
+  background-color: var(--todoBackgroundColor);
+  border-radius: 5px;
+  color: var(--todoTextColor);
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 35px;
 }
 
 .newTodo input{
